@@ -1,0 +1,131 @@
+---
+- name: Setup node_exporter
+  hosts: hosts
+
+  tasks:
+  - name: Creating prometheus user group
+    group: name="prometheus"
+    become: true
+
+
+  - name: Creating prometheus user
+    user:
+      name: prometheus
+      group: prometheus
+      system: yes
+      shell: "/sbin/nologin"
+      comment: "prometheus nologin User"
+      createhome: "no"
+      state: present
+
+  - name: download prometheus.tar.gz
+    unarchive:
+      src: "https://github.com/prometheus/prometheus/releases/download/v2.2.1/prometheus-2.2.1.linux-amd64.tar.gz"
+      dest: /root/
+      remote_src: yes
+
+  - name: Copy prometheus file to bin
+    copy:
+      src: "/root/prometheus-2.2.1.linux-amd64/prometheus"
+      dest: "/usr/local/bin/prometheus"
+      owner: prometheus
+      group: prometheus
+      remote_src: yes
+      mode: 0755
+
+  - name: Copy protool file to bin
+    copy:
+      src: "/root/prometheus-2.2.1.linux-amd64/promtool"
+      dest: "/usr/local/bin/prometheus"
+      owner: prometheus
+      group: prometheus
+      remote_src: yes
+      mode: 0755
+
+  - name: Copy console file to bin
+    copy:
+      src: "/root/prometheus-2.2.1.linux-amd64/consoles "
+      dest: "/etc/prometheus/prometheus"
+      owner: prometheus
+      group: prometheus
+      remote_src: yes
+      mode: 0755
+
+  - name: Copy console_lib file to bin
+    copy:
+      src: "/root/prometheus-2.2.1.linux-amd64/consoles_libraries"
+      dest: "/etc/prometheus/prometheus"
+      owner: prometheus
+      group: prometheus
+      remote_src: yes
+      mode: 0755
+
+
+  - name: Delete prometheus folder
+    file:
+      path: '/root/prometheus-2.2.1.linux-amd64'
+      state: absent
+
+  - name: create service file
+    copy:
+      content: |
+               global:
+                 scrape_interval:     15s
+                 evaluation_interval: 15s
+
+               rule_files:
+                  # - "first.rules"
+                  #   # - "second.rules"
+                  #
+                  #   scrape_configs:
+               - job_name: 'node_exporter'
+                 scrape_interval: 5s
+                 static_configs:
+                   - targets: ['localhost:9100']
+      dest: /etc/prometheus/prometheus.yml
+      owner: prometheus
+      group: prometheus
+
+
+
+
+  - name : start prometheus 
+    shell : "prometheus /usr/local/bin/prometheus --config.file /etc/prometheus/prometheus.yml --storage.tsdb.path /var/lib/prometheus/ --web.console.templates=/etc/prometheus/consoles --web.console.libraries=/etc/prometheus/console_libraries"
+
+
+  - name : Edit prometheus.service file
+    copy: 
+      content : |
+                [Unit]
+                  Description=Prometheus Monitoring
+                  Wants=network-online.target
+                  After=network-online.target
+
+                [Service]
+                  User=prometheus
+                  Group=prometheus
+                  Type=simple
+                  ExecStart=/usr/local/bin/prometheus \
+                  --config.file /etc/prometheus/prometheus.yml \
+                  --storage.tsdb.path /var/lib/prometheus/ \
+                  --web.console.templates=/etc/prometheus/consoles \
+                  --web.console.libraries=/etc/prometheus/console_libraries
+                  ExecReload=/bin/kill -HUP $MAINPID
+
+                [Install]
+                  WantedBy=multi-user.target
+      dest: /etc/prometheus/prometheus.yml
+
+  - name: Start prometheus service
+    service:
+      name: prometheus
+      state: restarted
+      enabled: yes
+
+  - name: Check if prometheus is accessible
+    uri:
+      url: http://localhost:9090
+      method: GET
+      status_code: 200
+
+

@@ -1,0 +1,95 @@
+---
+- name: Setup node_exporter
+  hosts: hosts
+
+  tasks:
+  - name: Creating prometheus user group
+    group: name="prometheus"
+    become: true
+
+
+  - name: Creating prometheus user
+    user:
+      name: prometheus
+      group: prometheus
+      system: yes
+      shell: "/sbin/nologin"
+      comment: "prometheus nologin User"
+      createhome: "no"
+      state: present
+
+  - name: Install node_exporter
+    sudo : yes
+    unarchive:
+      src: "https://github.com/prometheus/node_exporter/releases/download/v0.16.0/node_exporter-0.16.0.linux-amd64.tar.gz"
+      dest: /usr/share/
+      remote_src: yes
+
+
+  - name: Copy node_exporter file to bin
+    copy:
+      src: "/usr/share/node_exporter-0.16.0.linux-amd64/node_exporter"
+      dest: "/usr/local/bin/"
+      owner: prometheus
+      group: prometheus
+      remote_src: yes
+      mode: 0755
+
+
+  - name: Delete node_exporter folder
+    file:
+      path: '/usr/share/node_exporter-0.16.0.linux-amd64/'
+      state: absent
+
+  - name: create service file
+    copy:
+      content: |
+               [Unit]
+               Description=Prometheus exporter
+               Documentation=https://github.com/prometheus/node_exporter
+               Wants=network-online.target
+               After=network-online.target
+  
+               [Service]
+               Type=simple
+               User=prometheus
+               Group=prometheus
+               ExecReload=/bin/kill -HUP $MAINPID
+               ExecStart=/usr/local/bin/node_exporter \
+                --collector.cpu \
+                --collector.diskstats \
+                --collector.filesystem \
+                --collector.loadavg \
+                --collector.meminfo \
+                --collector.filefd \
+                --collector.netdev \
+                --collector.stat \
+                --collector.netstat \
+                --collector.systemd \
+                --collector.uname \
+                --collector.vmstat \
+                --collector.time \
+                --collector.mdadm \
+                --collector.zfs \
+                --collector.tcpstat \
+                --collector.bonding \
+                --collector.hwmon \
+                --collector.arp \
+                --web.listen-address=:9100 \
+  
+                SyslogIdentifier=node_exporter
+                Restart=always
+  
+                [Install]
+                WantedBy=multi-user.target
+      dest: /etc/systemd/system/node_exporter.service
+
+
+
+  handlers:
+
+  - name: restart node_exporter
+    service:
+      name: node_exporter
+      state: started
+      enabled: yes
