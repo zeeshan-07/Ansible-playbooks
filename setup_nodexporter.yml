@@ -3,18 +3,18 @@
   hosts: hosts
 
   tasks:
-  - name: Creating prometheus user group
-    group: name="prometheus"
+  - name: Creating node_exporter user group
+    group: name="node_exporter"
     become: true
 
 
-  - name: Creating prometheus user
+  - name: Creating node_exporter user
     user:
-      name: prometheus
-      group: prometheus
+      name: node_exporter
+      group: node_exporter
       system: yes
       shell: "/sbin/nologin"
-      comment: "prometheus nologin User"
+      comment: "node_exporter nologin User"
       createhome: "no"
       state: present
 
@@ -30,8 +30,8 @@
     copy:
       src: "/usr/share/node_exporter-0.16.0.linux-amd64/node_exporter"
       dest: "/usr/local/bin/"
-      owner: prometheus
-      group: prometheus
+      owner: node_exporter
+      group: node_exporter
       remote_src: yes
       mode: 0755
 
@@ -52,8 +52,8 @@
   
                [Service]
                Type=simple
-               User=prometheus
-               Group=prometheus
+               User=node_exporter
+               Group=node_exporter
                ExecReload=/bin/kill -HUP $MAINPID
                ExecStart=/usr/local/bin/node_exporter \
                 --collector.cpu \
