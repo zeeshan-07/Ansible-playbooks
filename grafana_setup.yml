@@ -3,7 +3,7 @@
 - name: Grafana Setup
   hosts: hosts
   gather_facts: false
-  remote_user: root
+  remote_user: jump_host
   sudo: yes
 
   tasks:
@@ -39,3 +39,4 @@
         systemctl restart grafana-server
         firewall-cmd --zone=public --add-port=3000/tcp --permanent
         firewall-cmd --reload
+

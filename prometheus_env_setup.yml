@@ -1,6 +1,6 @@
 ---
 - name: Setup Promethteus
-  hosts: hosts
+  hosts: prometheus_node
 
   tasks:
   - name: Creating prometheus user group

@@ -1,6 +1,6 @@
 ---
 - name: Setup node_exporter
-  hosts: hosts
+  hosts: node_exporter
 
   tasks:
   - name: Creating node_exporter user group

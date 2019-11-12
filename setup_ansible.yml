@@ -1,0 +1,33 @@
+---
+- name: Install the fio service
+  hosts: director
+  become: yes
+
+  tasks:
+   - name: install ansible
+     yum:
+       name: ansible
+       state: present
+
+
+   - name: download ansible playbooks 
+     unarchive:
+      src: "https://codeload.github.com/zeeshan-07/Ceph-ansible-playbooks/zip/master"
+      dest: /root/
+      remote_src: yes
+   
+   
+   - name : setup ansible ohst file
+     copy:
+       content : |
+                 [fio]
+                 localhost ansible_ssh_user=user1
+                 [node_exporter]
+                 cntl[0:2]   ansible_ssh_user=root
+                 nova[0:2]   ansible_ssh_user=root
+                 stor[0:2]   ansible_ssh_user=root
+       dest : /etc/ansible/hosts
+   
+   - name : Run ansible playbook
+     shell : |
+             ansible-playbook /root/Ceph-ansible-playbooks-master/fio_deployment.yml
