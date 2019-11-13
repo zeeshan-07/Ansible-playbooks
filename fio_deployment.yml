@@ -1,6 +1,6 @@
 ---
 - name: Install the fio service
-  hosts: fio
+  hosts: fio 
   become: yes
 
   tasks:

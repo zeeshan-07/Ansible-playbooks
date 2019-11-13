@@ -1,0 +1,157 @@
+---
+- name: Setup Promethteus
+  hosts: prometheus_node
+
+  tasks:
+  - name: Creating prometheus user group
+    group: name="prometheus"
+    become: true
+
+
+  - name: Creating prometheus user
+    user:
+      name: prometheus
+      group: prometheus
+      system: yes
+      shell: "/sbin/nologin"
+      comment: "prometheus nologin User"
+      createhome: "no"
+      state: present
+
+
+  - name: download prometheus.tar.gz
+    unarchive:
+      src: "https://github.com/prometheus/prometheus/releases/download/v2.2.1/prometheus-2.2.1.linux-amd64.tar.gz"
+      dest: /root/
+      remote_src: yes
+
+  - name: Creates directory
+    file:
+      path: "/etc/prometheus/"
+      state: directory
+      owner: prometheus
+      group: prometheus
+
+
+
+  - name: Copy prometheus file to bin
+    copy:
+      src: "/root/prometheus-2.2.1.linux-amd64/prometheus"
+      dest: "/usr/local/bin/"
+      owner: prometheus
+      group: prometheus
+      remote_src: yes
+      mode: 0755
+
+  - name: Copy protool file to bin
+    copy:
+      src: "/root/prometheus-2.2.1.linux-amd64/promtool"
+      dest: "/usr/local/bin/"
+      owner: prometheus
+      group: prometheus
+      remote_src: yes
+      mode: 0755
+
+  - name: Copy console file to bin
+    copy:
+      src: "/root/prometheus-2.2.1.linux-amd64/consoles"
+      dest: "/etc/prometheus/"
+      owner: prometheus
+      group: prometheus
+      remote_src: yes
+      mode: 0755
+
+  - name: Copy console_lib file to bin
+    copy:
+      src: "/root/prometheus-2.2.1.linux-amd64/console_libraries"
+      dest: "/etc/prometheus/"
+      owner: prometheus
+      group: prometheus
+      remote_src: yes
+      mode: 0755
+
+
+  - name: Delete prometheus folder
+    file:
+      path: '/root/prometheus-2.2.1.linux-amd64'
+      state: absent
+
+  - name: Creates directory
+    file:
+      path: "/var/lib/prometheus"
+      state: directory
+      owner: prometheus
+      group: prometheus
+      mode: 0755
+
+
+  - name: create service file
+    copy:
+      content: |
+               global:
+                 scrape_interval:     15s # Set the scrape interval to every 15 seconds. Default is every 1 minute.
+                 evaluation_interval: 15s # Evaluate rules every 15 seconds. The default is every 1 minute.
+                 scrape_timeout: 15s  # scrape_timeout is set to the global default (10s).
+               
+               scrape_configs:
+                 - job_name: 'prometheus'
+                   static_configs:
+                   - targets: ['localhost:9090']
+      dest: /etc/prometheus/prometheus.yml
+      owner: prometheus
+      group: prometheus
+
+
+  - name : create prometheus.service file
+    copy: 
+      content : |
+                [Unit]
+                Description=Prometheus
+                Documentation=https://prometheus.io/docs/introduction/overview/
+                Wants=network-online.target
+                After=network-online.target
+                
+                [Service]
+                Type=simple
+                Environment="GOMAXPROCS=2"
+                User=prometheus
+                Group=prometheus
+                ExecReload=/bin/kill -HUP $MAINPID
+                ExecStart=/usr/local/bin/prometheus \
+                --config.file=/etc/prometheus/prometheus.yml \
+                --storage.tsdb.path=/var/lib/prometheus \
+                --web.console.templates=/etc/prometheus/consoles \
+                --web.console.libraries=/etc/prometheus/console_libraries \
+                --web.listen-address=0.0.0.0:9090 \
+                --web.external-url=
+                
+                SyslogIdentifier=prometheus
+                Restart=always
+            
+                [Install]
+                WantedBy=multi-user.target                
+      dest: /etc/systemd/system/prometheus.service
+      owner: root
+      group: root
+
+  - name: Start prometheus service
+    service:
+      name: prometheus
+      state: restarted
+      enabled: yes
+
+  - name: Check if prometheus is accessible
+    uri:
+      url: http://localhost:9090
+      method: GET
+      status_code: 200
+
+
+  handlers:
+
+  - name: restart proetheus service
+    service:
+      name: prometheus
+      state: restarted
+      enabled: yes
+      notify: systemd_reload   
