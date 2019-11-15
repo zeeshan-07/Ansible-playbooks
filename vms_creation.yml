@@ -1,42 +1,44 @@
 ---
 
-- name: vm creation
+- name: vms creation
   hosts: hosts
-  gather_facts: false
-  remote_user: root
-  sudo: yes
   vars:
-    vm_names: [vm1, vm2, vm3, vm4, vm5, vm6, vm7, vm8, vm9, vm10, vm11, vm12, vm13, vm14, vm15, vm16, vm17, vm18, vm19, vm20]
-    vm_ips:[]
+    vm_names: [vm1, vm2, vm3, vm4, vm5, vm6, vm7, vm8, vm9, vm10]
+    vm_ips: [100.67.60.205, 100.67.60.206, 100.67.60.207, 100.67.60.208, 100.67.60.209, 100.67.60.210, 100.67.60.211, 100.67.60.212, 100.67.60.213, 100.67.60.214]
 
   tasks:
     - name: Creating Instance
-      os_server:
-        state: present
-        cloud: openstack
-        name: "{{item}}"
-        image: CentOS-7-x86_64-GenericCloud
-        key_name: ssh-key
-        timeout: 200
-        flavor: m1.small
-        network: network1
-        auto_ip: yes
-        security_groups:
-          - test-security-group
-      loop: "{{vm_names}}"
-    - name: Assigning Floating IP to VM 
-      os_floating_ip:
-        cloud: dguerri
-        state: present
-        reuse: yes
-        server: cattle001
-        network: ext_net
-        fixed_address: "{{item}}"
-        wait: true
-        timeout: 180
-      loop: "{{vm_ips}}"      
+      shell: |
+             source /home/osp_admin/r60rc
+             openstack server create --flavor sanity_flavor --image centos --key-name ssh-key --network network1 "{{ item }}"
+      with_items: "{{vm_names}}"
+      register: std_output
+    - debug: var=std_output
+
+    - name: Assigning Floating IP to VM
+      shell: |
+             source /home/osp_admin/r60rc
+             openstack floating ip create --floating-ip-address "{{ item.0 }}" public
+             openstack server add floating ip "{{ item.1 }}" "{{ item.0 }}"
+      with_together:
+        - "{{vm_ips}}"
+        - "{{vm_names}}"
+      register: std_output
+    - debug: var=std_output
+
     - name: VM ping from Externl Network
       shell: |
-        ping -c 1 "{{item}}" &> /dev/null && echo vm ping successful || echo vm ping failed
-      loop: "{{vm_ips}}"   
- 
+        ping -c 1 "{{ item.0 }}" &> /dev/null && echo "{{ item.1 }}" ping successful || echo vm ping failed
+      with_together:
+        - "{{vm_ips}}"
+        - "{{vm_names}}"
+      register: std_output
+    - debug: var=std_output
+
+    - name:
+      fetch:
+        src: /home/osp_admin/ssh-key.pem
+        dest: /etc/ansible/ssh-key.pem
+        flat: yes
+      register: std_output
+    - debug: var=std_output
