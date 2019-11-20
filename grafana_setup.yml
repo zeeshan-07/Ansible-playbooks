@@ -3,15 +3,12 @@
 - name: Grafana Setup
   hosts: grafana
   gather_facts: false
-  remote_user: root
   sudo: yes
-
   tasks:
     - name: Setting "SELINUX=disabled"
       shell: |
         echo "SELINUX=disabled" > /etc/sysconfig/selinux
         echo "SELINUXTYPE=targeted" >> /etc/sysconfig/selinux
-
     - name: Creating Grafana Repository"
       shell: |
         echo "[grafana]" > /etc/yum.repos.d/grafana.repo
@@ -23,15 +20,12 @@
         echo "gpgkey=https://packages.grafana.com/gpg.key" >> /etc/yum.repos.d/grafana.repo
         echo "sslverify=1" >> /etc/yum.repos.d/grafana.repo
         echo "sslcacert=/etc/pki/tls/certs/ca-bundle.crt" >> /etc/yum.repos.d/grafana.repo
-
     - name: Installing Grafana and its Font Packages
-      yum:
-        name: 
-          - grafana
-          - fontconfig
-          - freetype*
-          - urw-fonts
-        state: present
+      shell: |
+        yum install -y grafana
+        yum install -y fontconfig
+        yum install -y freetype*
+        yum install -y urw-fonts
 
     - name: Restarting Grafana Service
       shell: |
