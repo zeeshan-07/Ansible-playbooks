@@ -1,10 +1,17 @@
+# This  play book will work perfectly if 'StrictHostKeyChecking no' in your /etc/ssh/ssh_config file
 ---
 - name: Install the fio service
-  hosts: fio 
-  become: yes
-
+  hosts: instances
   tasks:
-   - name: install fio
-     yum:
-       name: fio
-       state: present
+    - name: Adding DNS server in vms
+      shell: |
+        sudo chmod 777 /etc/resolv.conf
+        sudo echo "nameserver 8.8.8.8" > /etc/resolv.conf
+      register: std_output
+    - debug: var=std_output
+
+    - name : Installing fio in vms
+      shell: |
+        sudo yum install -y fio
+      register: std_output
+    - debug: var=std_output
