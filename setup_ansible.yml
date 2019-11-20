@@ -1,5 +1,5 @@
 ---
-- name: Install the fio service
+- name: Install the node_exporter service
   hosts: director
   become: yes
 
@@ -20,8 +20,6 @@
    - name : setup ansible ohst file
      copy:
        content : |
-                 [fio]
-                 localhost ansible_ssh_user=user1
                  [node_exporter]
                  cntl[0:2]   ansible_ssh_user=root
                  nova[0:2]   ansible_ssh_user=root
@@ -30,4 +28,4 @@
    
    - name : Run ansible playbook
      shell : |
-             ansible-playbook /root/Ceph-ansible-playbooks-master/fio_deployment.yml
+             ansible-playbook /root/Ceph-ansible-playbooks-master/setup_nodexporter.yml
