@@ -1,0 +1,6 @@
+---
+#- import_playbook: vm_env_setup.yml       #will setup environment(network, subnet, and router)
+- import_playbook: vm_creation.yml          #will create vm, assign floating ip, ping from external network, copy ssh-key.pem from director to jump host on openstack
+- import_playbook: fio_deployment.yml       #install fio on created vms
+- import_playbook: grafana_setup.yml        #install grafana and its packages on linux jump host
+- import_playbook: setup_ansible.yml        #install ansible on director and run playbook setup_nodexporter.yml to install nodexporter on overcloude nodes(computes, controller, storage)
