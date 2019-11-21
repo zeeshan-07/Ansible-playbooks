@@ -12,7 +12,7 @@
 
    - name: download ansible playbooks 
      unarchive:
-      src: "https://github.com/MuhammadAsif1/Ansible-playbooks.git"
+      src: "https://github.com/MuhammadAsif1/Ansible-playbooks/archive/master.zip"
       dest: /root/
       remote_src: yes
    - name: read the hosts file
