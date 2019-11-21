@@ -12,7 +12,7 @@
 
    - name: download ansible playbooks 
      unarchive:
-      src: "https://codeload.github.com/zeeshan-07/Ceph-ansible-playbooks/zip/master"
+      src: "https://github.com/MuhammadAsif1/Ansible-playbooks.git"
       dest: /root/
       remote_src: yes
    - name: read the hosts file
@@ -30,9 +30,9 @@
          cntl0 ansible_ssh_host=cntl0 ansible_ssh_pass=Dell0SS! ansible_ssh_user=heat-admin ansible_become_method=enable
          cntl1 ansible_ssh_host=cntl1 ansible_ssh_pass=Dell0SS! ansible_ssh_user=heat-admin ansible_become_method=enable
          cntl2 ansible_ssh_host=cntl2 ansible_ssh_pass=Dell0SS! ansible_ssh_user=heat-admin ansible_become_method=enable
-         str0 ansible_ssh_host=str0 ansible_ssh_pass=Dell0SS! ansible_ssh_user=heat-admin ansible_become_method=enable
-         str1 ansible_ssh_host=str1 ansible_ssh_pass=Dell0SS! ansible_ssh_user=heat-admin ansible_become_method=enable
-         str2 ansible_ssh_host=str2 ansible_ssh_pass=Dell0SS! ansible_ssh_user=heat-admin ansible_become_method=enable
+         str0 ansible_ssh_host=stor0 ansible_ssh_pass=Dell0SS! ansible_ssh_user=heat-admin ansible_become_method=enable
+         str1 ansible_ssh_host=stor1 ansible_ssh_pass=Dell0SS! ansible_ssh_user=heat-admin ansible_become_method=enable
+         str2 ansible_ssh_host=stor2 ansible_ssh_pass=Dell0SS! ansible_ssh_user=heat-admin ansible_become_method=enable
      become: true
      when: string.stdout.find('[node_exporter]') == -1
    
