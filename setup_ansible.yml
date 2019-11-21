@@ -33,6 +33,7 @@
          str0 ansible_ssh_host=str0 ansible_ssh_pass=Dell0SS! ansible_ssh_user=heat-admin ansible_become_method=enable
          str1 ansible_ssh_host=str1 ansible_ssh_pass=Dell0SS! ansible_ssh_user=heat-admin ansible_become_method=enable
          str2 ansible_ssh_host=str2 ansible_ssh_pass=Dell0SS! ansible_ssh_user=heat-admin ansible_become_method=enable
+     become: true
      when: string.stdout.find('[node_exporter]') == -1
    
    - name : setup ansible host file
