@@ -1,27 +1,39 @@
+#This playbook is using RHOSP overcloud commands
+#RHOSP 13 is using python 2.7 and to use openstack module in ansible it require openstacksdk=0.12.0, and RHOSP 13 is not supporting openstacksdk=0.12.0. so that's why we are using overcloud commands.
 ---
 - name: Create a environment
-  hosts: hosts
+  hosts: director                                #Playbook will run on director vm of RHOSP
   tasks:
-    - name: create network and subnet
+    - name: Scaning Networks               
+      shell: |
+             source /home/osp_admin/r60rc        #r60rc is overcloud rc file of RHOSP, different for different stamp 
+             openstack network list
+      register: string
+
+    - name: creating network and subnet          #network and subnet will be created if network1 does not exit
       shell: |
              source /home/osp_admin/r60rc
-             openstack network create network1
+             openstack network create network1   #static network name -> network1, and subnet
              openstack subnet create subnet1 --network network1 --subnet-range 192.168.50.0/24
-      register: print_output
-    - debug: var=print_output
+      when: print_output.stdout is search('network1')
+      when: string.stdout.find('network1') == -1 
 
-    - name: create subnet
+    - name: creating router
       shell: |
              source /home/osp_admin/r60rc
-             openstack router create router1
+             openstack router create router1      #static name for router -> router1
              openstack router add subnet router1 subnet1
-             openstack router set router1 --external-gateway public
-      register: print_output
-    - debug: var=print_output
-
-#    - name: create ssh-key
-#      shell: |
-#             source /home/osp_admin/r60rc
-#             openstack keypair create ssh-key > /home/osp_admin/ssh-key.pem
-#      register: print_output
-#    - debug: var=print_output
+             openstack router set router1 --external-gateway public    #here 'public' is external network 
+      when: string.stdout.find('network1') == -1  #this task will be executed if network1 does not exist
+ 
+    - name: Scaning ssh-key
+      shell: |
+             source /home/osp_admin/r60rc
+             openstack keypair list
+      register: string
+ 
+    - name: creating ssh-key
+      shell: |
+             source /home/osp_admin/r60rc
+             openstack keypair create ssh-key > /home/osp_admin/ssh-key.pem  #same directory will used in other modules
+      when: string.stdout.find('ssh-key') == -1   #if ssh-key is not present
