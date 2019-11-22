@@ -84,10 +84,6 @@
                 WantedBy=multi-user.target
       dest: /etc/systemd/system/node_exporter.service
 
-
-
-  handlers:
-
   - name: restart node_exporter
     service:
       name: node_exporter
