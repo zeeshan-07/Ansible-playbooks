@@ -23,7 +23,7 @@
      blockinfile:
        path: /etc/ansible/hosts
        block: |
-         [node_exporter]
+         [node_exporter]                      #overcloud nodes parameters
          nova0 ansible_ssh_host=nova0 ansible_ssh_pass=Dell0SS! ansible_ssh_user=heat-admin ansible_become_method=enable
          nova1 ansible_ssh_host=nova1 ansible_ssh_pass=Dell0SS! ansible_ssh_user=heat-admin ansible_become_method=enable
          nova2 ansible_ssh_host=nova2 ansible_ssh_pass=Dell0SS! ansible_ssh_user=heat-admin ansible_become_method=enable
@@ -33,17 +33,8 @@
          str0 ansible_ssh_host=stor0 ansible_ssh_pass=Dell0SS! ansible_ssh_user=heat-admin ansible_become_method=enable
          str1 ansible_ssh_host=stor1 ansible_ssh_pass=Dell0SS! ansible_ssh_user=heat-admin ansible_become_method=enable
          str2 ansible_ssh_host=stor2 ansible_ssh_pass=Dell0SS! ansible_ssh_user=heat-admin ansible_become_method=enable
-     when: string.stdout.find('[node_exporter]') == -1
+     when: string.stdout.find('[node_exporter]') == -1 #condition--> will add no_exporters if does not exist
    
-   - name : setup ansible host file
-     copy:
-       content : |
-                 [node_exporter]
-                 cntl[0:2]   ansible_ssh_user=root
-                 nova[0:2]   ansible_ssh_user=root
-                 stor[0:2]   ansible_ssh_user=root
-       dest : /etc/ansible/hosts
-   
-   - name : Run ansible playbook
-     shell : |
-             ansible-playbook /root/Ceph-ansible-playbooks-master/setup_nodexporter.yml -i /etc/ansible/hosts
+#   - name : Run ansible playbook
+#     shell : |
+#             ansible-playbook /root/Ceph-ansible-playbooks-master/setup_nodexporter.yml -i /etc/ansible/hosts
