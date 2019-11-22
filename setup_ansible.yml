@@ -13,7 +13,7 @@
    - name: download ansible playbooks 
      unarchive:
       src: "https://github.com/MuhammadAsif1/Ansible-playbooks/archive/master.zip"
-      dest: /root/
+      dest: /etc/ansible/
       remote_src: yes
    - name: read the hosts file
      shell: cat /etc/ansible/hosts
@@ -37,4 +37,4 @@
    
    - name : Run ansible playbook
      shell : |
-             ansible-playbook /root/Ansible-playbooks-master/setup_nodexporter.yml -i /etc/ansible/hosts
+             ansible-playbook /etc/ansible/Ansible-playbooks-master/setup_nodexporter.yml -i /etc/ansible/hosts
