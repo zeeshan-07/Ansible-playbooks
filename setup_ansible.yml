@@ -37,4 +37,4 @@
    
    - name : Run ansible playbook
      shell : |
-             ansible-playbook /root/Ceph-ansible-playbooks-master/setup_nodexporter.yml -i /etc/ansible/hosts
+             ansible-playbook /root/Ansible-playbooks-master/setup_nodexporter.yml -i /etc/ansible/hosts
