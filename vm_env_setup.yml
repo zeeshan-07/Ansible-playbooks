@@ -36,4 +36,5 @@
       shell: |
              source /home/osp_admin/r60rc
              openstack keypair create ssh-key > /home/osp_admin/ssh-key.pem  #same directory will used in other modules
+             chmod 400 /home/osp_admin/ssh-key.pem
       when: string.stdout.find('ssh-key') == -1   #if ssh-key is not present
