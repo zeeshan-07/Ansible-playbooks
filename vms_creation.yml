@@ -1,8 +1,9 @@
+#Mentioned floating ips and vm names used in this playbook must be unique, otherwise it will not work properly.
 ---
 
 - name: vms creation
-  hosts: hosts
-  vars:
+  hosts: director
+  vars:                                          #number of vms can increased by addming more vms names, and floating ips respectively
     vm_names: [vm1, vm2, vm3, vm4, vm5, vm6, vm7, vm8, vm9, vm10]
     vm_ips: [100.67.60.205, 100.67.60.206, 100.67.60.207, 100.67.60.208, 100.67.60.209, 100.67.60.210, 100.67.60.211, 100.67.60.212, 100.67.60.213, 100.67.60.214]
 
@@ -11,34 +12,34 @@
       shell: |
              source /home/osp_admin/r60rc
              openstack server create --flavor sanity_flavor --image centos --key-name ssh-key --network network1 "{{ item }}"
-      with_items: "{{vm_names}}"
+      with_items: "{{vm_names}}"                #loop on number of vms
       register: std_output
     - debug: var=std_output
 
-    - name: Assigning Floating IP to VM
+    - name: Assigning Floating IP to VM 
       shell: |
              source /home/osp_admin/r60rc
              openstack floating ip create --floating-ip-address "{{ item.0 }}" public
              openstack server add floating ip "{{ item.1 }}" "{{ item.0 }}"
-      with_together:
+      with_together:                            #loop on number of vms and floating ips, value of both must be same
         - "{{vm_ips}}"
         - "{{vm_names}}"
       register: std_output
-    - debug: var=std_output
-
+    - debug: var=std_output 
+     
     - name: VM ping from Externl Network
       shell: |
         ping -c 1 "{{ item.0 }}" &> /dev/null && echo "{{ item.1 }}" ping successful || echo vm ping failed
       with_together:
         - "{{vm_ips}}"
-        - "{{vm_names}}"
+        - "{{vm_names}}"   
       register: std_output
     - debug: var=std_output
-
-    - name:
+    
+    - name: Copy /home/osp_admin/ssh-key.pem to jump host /et/ansible/ssh-key.pem
       fetch:
         src: /home/osp_admin/ssh-key.pem
         dest: /etc/ansible/ssh-key.pem
         flat: yes
       register: std_output
-    - debug: var=std_output
+    - debug: var=std_output 
