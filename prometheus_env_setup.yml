@@ -1,6 +1,6 @@
 ---
 - name: Setup Promethteus
-  hosts: prometheus_node
+  hosts: director
 
   tasks:
   - name: Creating prometheus user group
@@ -24,6 +24,10 @@
       src: "https://github.com/prometheus/prometheus/releases/download/v2.2.1/prometheus-2.2.1.linux-amd64.tar.gz"
       dest: /root/
       remote_src: yes
+      owner: root
+      group: root
+      directory_mode: yes
+      mode: 0777
 
   - name: Creates directory
     file:
@@ -31,6 +35,7 @@
       state: directory
       owner: prometheus
       group: prometheus
+      mode: 0755
 
 
 
@@ -52,23 +57,27 @@
       remote_src: yes
       mode: 0755
 
-  - name: Copy console file to bin
-    copy:
-      src: "/root/prometheus-2.2.1.linux-amd64/consoles"
-      dest: "/etc/prometheus/"
-      owner: prometheus
-      group: prometheus
-      remote_src: yes
-      mode: 0755
+  - name: Copy console file to "/etc/prometheus/"
+    command: cp -r /root/prometheus-2.2.1.linux-amd64/consoles /etc/prometheus
+#    copy:
+#      src: "/root/prometheus-2.2.1.linux-amd64/consoles"
+#      dest: "/etc/prometheus"
+#      owner: prometheus
+#      group: prometheus
+#      directory_mode: yes
+#      remote_src: yes
+#      mode: 0755
 
-  - name: Copy console_lib file to bin
-    copy:
-      src: "/root/prometheus-2.2.1.linux-amd64/console_libraries"
-      dest: "/etc/prometheus/"
-      owner: prometheus
-      group: prometheus
-      remote_src: yes
-      mode: 0755
+  - name: Copy console_lib file to "/etc/prometheus/"
+    command: cp -r /root/prometheus-2.2.1.linux-amd64/console_libraries /etc/prometheus
+
+#    copy:
+#      src: "/root/prometheus-2.2.1.linux-amd64/console_libraries"
+#      dest: "/etc/prometheus"
+#      owner: prometheus
+#      group: prometheus
+#      remote_src: yes
+#      mode: 0755
 
 
   - name: Delete prometheus folder
@@ -92,7 +101,7 @@
                  scrape_interval:     15s # Set the scrape interval to every 15 seconds. Default is every 1 minute.
                  evaluation_interval: 15s # Evaluate rules every 15 seconds. The default is every 1 minute.
                  scrape_timeout: 15s  # scrape_timeout is set to the global default (10s).
-               
+
                scrape_configs:
                  - job_name: 'prometheus'
                    static_configs:
@@ -103,14 +112,14 @@
 
 
   - name : create prometheus.service file
-    copy: 
+    copy:
       content : |
                 [Unit]
                 Description=Prometheus
                 Documentation=https://prometheus.io/docs/introduction/overview/
                 Wants=network-online.target
                 After=network-online.target
-                
+
                 [Service]
                 Type=simple
                 Environment="GOMAXPROCS=2"
@@ -124,12 +133,12 @@
                 --web.console.libraries=/etc/prometheus/console_libraries \
                 --web.listen-address=0.0.0.0:9090 \
                 --web.external-url=
-                
+
                 SyslogIdentifier=prometheus
                 Restart=always
-            
+
                 [Install]
-                WantedBy=multi-user.target                
+                WantedBy=multi-user.target
       dest: /etc/systemd/system/prometheus.service
       owner: root
       group: root
@@ -154,4 +163,4 @@
       name: prometheus
       state: restarted
       enabled: yes
-      notify: systemd_reload   
+      notify: systemd_reload
