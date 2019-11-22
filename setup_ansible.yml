@@ -24,15 +24,15 @@
        path: /etc/ansible/hosts
        block: |
          [node_exporter]                      #overcloud nodes parameters
-         nova0 ansible_ssh_host=nova0 ansible_ssh_pass=Dell0SS! ansible_ssh_user=heat-admin ansible_become_method=enable
-         nova1 ansible_ssh_host=nova1 ansible_ssh_pass=Dell0SS! ansible_ssh_user=heat-admin ansible_become_method=enable
-         nova2 ansible_ssh_host=nova2 ansible_ssh_pass=Dell0SS! ansible_ssh_user=heat-admin ansible_become_method=enable
-         cntl0 ansible_ssh_host=cntl0 ansible_ssh_pass=Dell0SS! ansible_ssh_user=heat-admin ansible_become_method=enable
-         cntl1 ansible_ssh_host=cntl1 ansible_ssh_pass=Dell0SS! ansible_ssh_user=heat-admin ansible_become_method=enable
-         cntl2 ansible_ssh_host=cntl2 ansible_ssh_pass=Dell0SS! ansible_ssh_user=heat-admin ansible_become_method=enable
-         str0 ansible_ssh_host=stor0 ansible_ssh_pass=Dell0SS! ansible_ssh_user=heat-admin ansible_become_method=enable
-         str1 ansible_ssh_host=stor1 ansible_ssh_pass=Dell0SS! ansible_ssh_user=heat-admin ansible_become_method=enable
-         str2 ansible_ssh_host=stor2 ansible_ssh_pass=Dell0SS! ansible_ssh_user=heat-admin ansible_become_method=enable
+         nova0 ansible_ssh_host=nova0 ansible_user=heat-admin ansible_become=true ansible_ssh_pass=Dell0SS!
+         nova1 ansible_ssh_host=nova1 ansible_user=heat-admin ansible_become=true ansible_ssh_pass=Dell0SS!
+         nova2 ansible_ssh_host=nova2 ansible_user=heat-admin ansible_become=true ansible_ssh_pass=Dell0SS!
+         cntl0 ansible_ssh_host=cntl0 ansible_user=heat-admin ansible_become=true ansible_ssh_pass=Dell0SS!
+         cntl1 ansible_ssh_host=cntl1 ansible_user=heat-admin ansible_become=true ansible_ssh_pass=Dell0SS!
+         cntl2 ansible_ssh_host=cntl2 ansible_user=heat-admin ansible_become=true ansible_ssh_pass=Dell0SS!
+         str0 ansible_ssh_host=stor0 ansible_user=heat-admin ansible_become=true ansible_ssh_pass=Dell0SS!
+         str1 ansible_ssh_host=stor1 ansible_user=heat-admin ansible_become=true ansible_ssh_pass=Dell0SS!
+         str2 ansible_ssh_host=stor2 ansible_user=heat-admin ansible_become=true ansible_ssh_pass=Dell0SS!
      when: string.stdout.find('[node_exporter]') == -1 #condition--> will add no_exporters if does not exist
    
 #   - name : Run ansible playbook
