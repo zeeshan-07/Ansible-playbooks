@@ -1,4 +1,5 @@
-# This  play book will work perfectly if 'StrictHostKeyChecking no' in your /etc/ssh/ssh_config file
+# This  playbook will work perfectly if 'StrictHostKeyChecking no' in your /etc/ssh/ssh_config file of jump host
+# in cloud vm has user name 'centos'  if you create through centos cloud image. can't login as root user, so can't run ansible module for file editing and package installation. that's why shell commands are used.
 ---
 - name: Install the fio service
   hosts: instances
@@ -10,7 +11,7 @@
       register: std_output
     - debug: var=std_output
 
-    - name : Installing fio in vms
+    - name: Installing fio in vms
       shell: |
         sudo yum install -y fio
       register: std_output
