@@ -16,4 +16,7 @@ Ansible host file configuration
 [prometheus]
 [grafana]
 
-Run this command on Linux Jump host ansible-playbook -i /etc/ansible/hosts /etc/ansible/master-playbook.yml --key-file "/etc/ansible/ssh-key.pem" to get things configured.
+Linux Jump host:
+git clone /etc/ansible/https://github.com/MuhammadAsif1/Ansible-playbooks.git
+Run this command 
+ansible-playbook -i /etc/ansible/Ansible-playbooks/hosts /etc/ansible/Ansible-playbooks/master-playbook.yml --key-file "/etc/ansible/ssh-key.pem"
