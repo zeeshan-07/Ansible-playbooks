@@ -3,7 +3,7 @@
 ---
 - import_playbook: vm_env_setup.yml       #will setup environment(network, subnet, and router)
 
-- import_playbook: vm_creation.yml          #will create vm, assign floating ip, ping from external network, copy ssh-key.pem from director to jump host on openstack.vm names in this module should be unique otherwis it will not work
+- import_playbook: vms_creation.yml          #will create vm, assign floating ip, ping from external network, copy ssh-key.pem from director to jump host on openstack.vm names in this module should be unique otherwis it will not work
 
 - import_playbook: fio_deployment.yml       #install fio on created vms
 
