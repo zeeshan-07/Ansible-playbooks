@@ -36,7 +36,7 @@
       register: std_output
     - debug: var=std_output
     
-    - name: Copy /home/osp_admin/ssh-key.pem to jump host /et/ansible/ssh-key.pem
+    - name: Copy /home/osp_admin/ssh-key.pem to jump host /etc/ansible/ssh-key.pem
       fetch:
         src: /home/osp_admin/ssh-key.pem
         dest: /etc/ansible/ssh-key.pem
