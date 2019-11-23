@@ -1,7 +1,6 @@
 ---
 - name: Install the node_exporter service
   hosts: director
-  become: yes
 
   tasks:
    - name: install ansible
@@ -15,6 +14,7 @@
       src: "https://github.com/MuhammadAsif1/Ansible-playbooks/archive/master.zip"
       dest: /etc/ansible/
       remote_src: yes
+
    - name: read the hosts file
      shell: cat /etc/ansible/hosts
      register: string
@@ -36,5 +36,8 @@
      when: string.stdout.find('[node_exporter]') == -1 #condition--> will add no_exporters if does not exist
    
    - name : Run ansible playbook
-     shell : |
-             ansible-playbook /etc/ansible/Ansible-playbooks-master/setup_nodexporter.yml -i /etc/ansible/hosts
+     command : ansible-playbook /etc/ansible/Ansible-playbooks-master/setup_nodexporter.yml -i /etc/ansible/hosts
+     become: true
+     become_user: osp_admin
+     register: output
+   - debug: var=output 
