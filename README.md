@@ -20,4 +20,5 @@ Linux Jump host:
 git clone /etc/ansible/https://github.com/MuhammadAsif1/Ansible-playbooks.git
 
 Run this command 
+
 ansible-playbook -i /etc/ansible/Ansible-playbooks/hosts /etc/ansible/Ansible-playbooks/master-playbook.yml --key-file "/etc/ansible/ssh-key.pem"
