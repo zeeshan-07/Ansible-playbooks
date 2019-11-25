@@ -9,6 +9,11 @@
       shell: |
         echo "SELINUX=disabled" > /etc/sysconfig/selinux
         echo "SELINUXTYPE=targeted" >> /etc/sysconfig/selinux
+    - name: Scanning Grafana service
+      shell: |
+        rpm -qa
+      register: string
+
     - name: Creating Grafana Repository"
       shell: |
         echo "[grafana]" > /etc/yum.repos.d/grafana.repo
@@ -20,16 +25,17 @@
         echo "gpgkey=https://packages.grafana.com/gpg.key" >> /etc/yum.repos.d/grafana.repo
         echo "sslverify=1" >> /etc/yum.repos.d/grafana.repo
         echo "sslcacert=/etc/pki/tls/certs/ca-bundle.crt" >> /etc/yum.repos.d/grafana.repo
-    - name: Installing Grafana and its Font Packages
+      when: string.stdout.find('grafana') == -1 
+
+    - name: Installing Grafana("username:admin" , "password:xflow@1234") and its Font Packages
       shell: |
         yum install -y grafana
         yum install -y fontconfig
         yum install -y freetype*
         yum install -y urw-fonts
-
-    - name: Restarting Grafana Service
-      shell: |
         systemctl enable grafana-server
         systemctl restart grafana-server
         firewall-cmd --zone=public --add-port=3000/tcp --permanent
         firewall-cmd --reload
+        grafana-cli admin reset-admin-password xflow@1234
+      when: string.stdout.find('grafana') == -1
