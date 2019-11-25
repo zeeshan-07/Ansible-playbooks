@@ -1,7 +1,7 @@
 ---
 
 - name: Grafana Setup
-  hosts: grafana
+  hosts: localhost
   gather_facts: false
   sudo: yes
   tasks:
