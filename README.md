@@ -5,7 +5,9 @@ The purpose of this task is to get Monitoring tools (Grafana, Prometheus, Nod ex
 Tools:
 
 Here we are using four tools they are
+
 i-	FIO 
+
 FIO is a versatile IO workload generator. FIO is an I/O tool meant to be used both for benchmark and stress/hardware verification. It has support for 19 different types of I/O engines. It was flexible enough to allow detailed workload setups, and it contains the reporting tools necessary to make sense of the data after tests are complete It can work on block devices as well as files. We are using FIO for benchmarking of RHOSP CEPH storage. It will be configured on VMs which will be created on overcloud compute nodes. 
 
 ii-	Node Exporter
