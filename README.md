@@ -1,6 +1,7 @@
                                                 Monitoring Infrastructure for CEPH Optimization
 Purpose:
 The purpose of this task is to get Monitoring tools (Grafana, Prometheus, Nod exporter) and load generator (FIO) configured through Automation. We did this automation through multiple ansible playbooks. Actually, we are using this monitoring infrastructure for benchmarking of CEPH Optimization in RHOSP environment.
+
 Tools:
 Here we are using four tools they are
 i-	FIO 
