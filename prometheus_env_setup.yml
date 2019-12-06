@@ -155,12 +155,6 @@
       state: restarted
       enabled: yes
 
-  - name: Check if prometheus is accessible
-    uri:
-      url: http://100.67.60.10:9090
-      method: GET
-      status_code: 200
-
 
   handlers:
 
