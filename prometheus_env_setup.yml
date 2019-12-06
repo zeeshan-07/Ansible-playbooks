@@ -110,7 +110,7 @@
                    static_configs:
                    - targets: ['nova0:9100','nova1:9100','nova2:9100','cntl0:9100','cntl1:9100','cntl2:9100','stor0:9100','stor1:9100','stor2:9100']
 
-  - name: Grafana
+  - job_name: 'Grafana'
     static_configs:
     - targets: ['100.67.60.59:3000']
       dest: /etc/prometheus/prometheus.yml
