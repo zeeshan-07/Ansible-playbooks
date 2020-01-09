@@ -1,0 +1,28 @@
+---
+- name:  Create and mount ceph volumes with loadgens
+  hosts: director
+  become: yes
+  vars:                                          #number of vms can increased by addming more vms names, and floating ips respectively
+    vm: [vm1, vm2, vm3]
+    volume_size: 50
+    numebr_of_ceph_volumes_perloadgen: 2
+    volume_name: [vdb, vdc]
+
+  tasks:
+   - name: Create volume
+     shell: |
+            source /home/osp_admin/r62rc
+            openstack volume create  --size {{item[0]}} {{item[2]}}.{{item[1]}}
+     with_nested:
+       - ['50']
+       - '{{volume_name}}'
+       - '{{vm}}'
+
+   - name: Mount volumes with loadgens
+     shell: |
+            source /home/osp_admin/r62rc
+            openstack server add volume  {{item[1]}} {{item[1]}}.{{item[0]}}
+     with_nested:
+       - '{{volume_name}}'
+       - '{{vm}}'
+
