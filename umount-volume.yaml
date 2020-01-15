@@ -13,7 +13,7 @@
    - name: Umount volumes
      shell: |
             source /home/osp_admin/r62rc
-            openstack server remove volume  {{item[2]}} {{item[2]}}.{{item[1]}}
+            openstack server remove volume  vm{{item[2]}} {{item[2]}}.{{item[1]}}
      with_nested:
        - ['50']
        - '{{volume_name}}'
