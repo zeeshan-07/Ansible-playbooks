@@ -1,0 +1,14 @@
+[director]
+director ansible_ssh_host=100.67.60.10 ansible_ssh_pass=Dell0SS! ansible_ssh_user=root
+
+[instances]   #overcloud instances ip and credentials 
+vm1 ansible_ssh_host=100.67.60.210 ansible_ssh_user=centos ansible_become_method=enable
+vm2 ansible_ssh_host=100.67.60.211 ansible_ssh_user=centos ansible_become_method=enable
+vm3 ansible_ssh_host=100.67.60.212 ansible_ssh_user=centos ansible_become_method=enable
+vm4 ansible_ssh_host=100.67.60.213 ansible_ssh_user=centos ansible_become_method=enable
+vm5 ansible_ssh_host=100.67.60.214 ansible_ssh_user=centos ansible_become_method=enable
+vm6 ansible_ssh_host=100.67.60.215 ansible_ssh_user=centos ansible_become_method=enable
+vm7 ansible_ssh_host=100.67.60.216 ansible_ssh_user=centos ansible_become_method=enable
+vm8 ansible_ssh_host=100.67.60.217 ansible_ssh_user=centos ansible_become_method=enable
+vm9 ansible_ssh_host=100.67.60.218 ansible_ssh_user=centos ansible_become_method=enable
+vm10 ansible_ssh_host=100.67.60.219 ansible_ssh_user=centos ansible_become_method=enable

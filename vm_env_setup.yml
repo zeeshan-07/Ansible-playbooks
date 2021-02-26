@@ -1,72 +1,40 @@
+#This playbook is using RHOSP overcloud commands
+#RHOSP 13 is using python 2.7 and to use openstack module in ansible it require openstacksdk=0.12.0, and RHOSP 13 is not supporting openstacksdk=0.12.0. so that's why we are using overcloud commands.
 ---
 - name: Create a environment
-  hosts: localhost
+  hosts: director                                #Playbook will run on director vm of RHOSP
   tasks:
-    - name: create network
-      os_network:
-        cloud: openstack
-        state: present
-        name: network1
-        external: false
-        wait: yes
+    - name: Scaning Networks               
+      shell: |
+             source /home/osp_admin/r60rc        #r60rc is overcloud rc file of RHOSP, different for different stamp 
+             openstack network list
+      register: string
 
-    - name: create subnet
-      os_subnet:
-        cloud: openstack
-        state: present
-        network_name: network1
-        name: subnet1
-        cidr: 192.168.50.0/24
-        dns_nameservers:
-          - 8.8.8.8
-        wait: yes
+    - name: creating network and subnet          #network and subnet will be created if network1 does not exit
+      shell: |
+             source /home/osp_admin/r60rc
+             openstack network create network1   #static network name -> network1, and subnet
+             openstack subnet create subnet1 --network network1 --subnet-range 192.168.50.0/24
+      when: print_output.stdout is search('network1')
+      when: string.stdout.find('network1') == -1 
 
-    - name: create a router
-      os_router:
-        cloud: openstack
-        state: present
-        name: router1
-        network: external-network
-        interfaces:
-          - subnet1
-
-    - name: create security group
-      os_security_group:
-        cloud: openstack
-        state: present
-        name: security-group
-        description: Security group for our  instances
-
-    - name: create security group rule for ping
-      os_security_group_rule:
-        cloud: openstack
-        security_group: security-group
-        protocol: icmp
-        remote_ip_prefix: 0.0.0.0/0
-
-    - name: create security group rule for SSH
-      os_security_group_rule:
-        cloud: openstack
-        security_group: security-group
-        protocol: tcp
-        port_range_min: 22
-        port_range_max: 22
-        remote_ip_prefix: 0.0.0.0/0
-
-    - name: Upload CentOS image to openstack
-      os_image:
-        name: CentOS
-        container_format: bare
-        disk_format: qcow2
-        state: present
-        filename: /tmp/cirros-0.3.4-x86_64-disk.img
-
-- name: Create keypair
-  hosts: hosts
-
-  tasks:
-   - name: generate key pair
-     shell: | 
-            source r8  
-            openstack keypair create ssh-key > /osp_admin/home/ssh-key.pem
-           
+    - name: creating router
+      shell: |
+             source /home/osp_admin/r60rc
+             openstack router create router1      #static name for router -> router1
+             openstack router add subnet router1 subnet1
+             openstack router set router1 --external-gateway public    #here 'public' is external network 
+      when: string.stdout.find('network1') == -1  #this task will be executed if network1 does not exist
+ 
+#    - name: Scaning ssh-key
+#      shell: |
+#             source /home/osp_admin/r60rc
+#             openstack keypair list
+#      register: string
+#
+#    - name: creating ssh-key
+#      shell: |
+#             source /home/osp_admin/r60rc
+#             openstack keypair create ssh-key > /home/osp_admin/ssh-key.pem  #same directory will used in other modules
+#             chmod 400 /home/osp_admin/ssh-key.pem
+#      when: string.stdout.find('ssh-key') == -1   #if ssh-key is not present

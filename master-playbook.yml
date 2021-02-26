@@ -1,0 +1,14 @@
+#Run this palybook using this command --> ansible-playbook -i /etc/ansible/hosts /etc/ansible/master-playbook.yml --key-file "/etc/ansible/ssh-key.pem" on Jumb host
+#ssh-key.pem file will be used in 'fio_deployment.yml', and will be copied from directo in 'vm_creation.yml'
+---
+- import_playbook: vm_env_setup.yml       #will setup environment(network, subnet, and router)
+
+- import_playbook: vms_creation.yml          #will create vm, assign floating ip, ping from external network, copy ssh-key.pem from director to jump host on openstack.vm names in this module should be unique otherwis it will not work
+
+- import_playbook: fio_deployment.yml       #install fio on created vms
+
+- import_playbook: grafana_setup.yml        #install grafana and its packages on linux jump host
+
+- import_playbook: prometheus_env_setup.yml #install prometheus on director
+
+- import_playbook: setup_ansible.yml        #install ansible on director and run playbook setup_nodexporter.yml to install nodexporter on overcloude nodes(computes, controller, storage)

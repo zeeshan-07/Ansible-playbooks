@@ -1,7 +1,6 @@
 ---
-- name: Install the fio service
+- name: Install the node_exporter service
   hosts: director
-  become: yes
 
   tasks:
    - name: install ansible
@@ -12,22 +11,33 @@
 
    - name: download ansible playbooks 
      unarchive:
-      src: "https://codeload.github.com/zeeshan-07/Ceph-ansible-playbooks/zip/master"
-      dest: /root/
+      src: "https://github.com/MuhammadAsif1/Ansible-playbooks/archive/master.zip"
+      dest: /etc/ansible/
       remote_src: yes
-   
-   
-   - name : setup ansible ohst file
-     copy:
-       content : |
-                 [fio]
-                 localhost ansible_ssh_user=user1
-                 [node_exporter]
-                 cntl[0:2]   ansible_ssh_user=root
-                 nova[0:2]   ansible_ssh_user=root
-                 stor[0:2]   ansible_ssh_user=root
-       dest : /etc/ansible/hosts
+
+   - name: read the hosts file
+     shell: cat /etc/ansible/hosts
+     register: string
+
+   - name: Task that only happens if the node exporter does not exists in /etc/ansible/hosts file
+     blockinfile:
+       path: /etc/ansible/hosts
+       block: |
+         [node_exporter]                      #overcloud nodes parameters
+         nova0 ansible_ssh_host=nova0 ansible_user=heat-admin ansible_become=true ansible_ssh_pass=Dell0SS!
+         nova1 ansible_ssh_host=nova1 ansible_user=heat-admin ansible_become=true ansible_ssh_pass=Dell0SS!
+         nova2 ansible_ssh_host=nova2 ansible_user=heat-admin ansible_become=true ansible_ssh_pass=Dell0SS!
+         cntl0 ansible_ssh_host=cntl0 ansible_user=heat-admin ansible_become=true ansible_ssh_pass=Dell0SS!
+         cntl1 ansible_ssh_host=cntl1 ansible_user=heat-admin ansible_become=true ansible_ssh_pass=Dell0SS!
+         cntl2 ansible_ssh_host=cntl2 ansible_user=heat-admin ansible_become=true ansible_ssh_pass=Dell0SS!
+         str0 ansible_ssh_host=stor0 ansible_user=heat-admin ansible_become=true ansible_ssh_pass=Dell0SS!
+         str1 ansible_ssh_host=stor1 ansible_user=heat-admin ansible_become=true ansible_ssh_pass=Dell0SS!
+         str2 ansible_ssh_host=stor2 ansible_user=heat-admin ansible_become=true ansible_ssh_pass=Dell0SS!
+     when: string.stdout.find('[node_exporter]') == -1 #condition--> will add no_exporters if does not exist
    
    - name : Run ansible playbook
-     shell : |
-             ansible-playbook /root/Ceph-ansible-playbooks-master/fio_deployment.yml
+     command : ansible-playbook /etc/ansible/Ansible-playbooks-master/setup_nodexporter.yml -i /etc/ansible/hosts
+     become: true
+     become_user: osp_admin
+     register: output
+   - debug: var=output 
